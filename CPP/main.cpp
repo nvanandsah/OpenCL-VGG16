@@ -7,8 +7,8 @@
 #include <stdexcept>
 using namespace std;
 
-#include "utils.h"
-#include "bmp-utils.h"
+// #include "utils.h"
+// #include "bmp-utils.h"
 
 float* readImgtxt(char *filename){
 	float *img;
@@ -176,7 +176,7 @@ int main()
    	std::vector<cl::Platform> platforms;
     cl::Platform::get(&platforms);
     std::vector<cl::Device> devices;
-    platforms[0].getDevices(CL_DEVICE_TYPE_GPU, &devices);
+    platforms[0].getDevices(CL_DEVICE_TYPE_CPU, &devices);
     cl::Context context(devices);
     cl::CommandQueue queue = cl::CommandQueue(context, devices[0]);
 	
@@ -196,7 +196,7 @@ int main()
 			1 -- MaxPool
 			2 -- Dense
 	*/
-	int arr[] = {0,1,3};
+	int arr[] = {0};
 	hInputImage = readImgtxt(inputImagePath);
 	input_buffer = hInputImage;
 	int LayerNum = 2;
@@ -290,9 +290,10 @@ int main()
 			// --------------------------------------------------- Layer 1 End
 
 			for (int p = 0;p<(out_channels*imgRows*imgCols);p++){ 
+					cout<<hOutputImage[p]<<" ";
 					//input_buffer[p] = output_buffer[p]; 
 				}
-			
+			cout<<"\n";
 		}
 		if(arr[i]==1){
 			/* ------------------------------------ MaxPool 2D Starts ------------------------------------ */
@@ -378,58 +379,58 @@ int main()
 			
 			try
 			{
-				cl::Buffer inputBuffer = cl::Buffer(context, CL_MEM_READ_ONLY, in_features*sizeof(float));
-				cl::Buffer outputBuffer = cl::Buffer(context, CL_MEM_WRITE_ONLY, out_features*sizeof(float));
-				cl::Buffer weightsBuffer = cl::Buffer(context, CL_MEM_READ_ONLY, in_features*out_features*sizeof(float));
-				cl::Buffer biasesBuffer = cl::Buffer(context, CL_MEM_READ_ONLY, out_features*sizeof(float));
-				cl::Buffer inFeaturesBuffer = cl::Buffer(context, CL_MEM_READ_ONLY, sizeof(int));
-				cl::Buffer outFeaturesBuffer = cl::Buffer(context, CL_MEM_READ_ONLY, sizeof(int));
+				// cl::Buffer inputBuffer = cl::Buffer(context, CL_MEM_READ_ONLY, in_features*sizeof(float));
+				// cl::Buffer outputBuffer = cl::Buffer(context, CL_MEM_WRITE_ONLY, out_features*sizeof(float));
+				// cl::Buffer weightsBuffer = cl::Buffer(context, CL_MEM_READ_ONLY, in_features*out_features*sizeof(float));
+				// cl::Buffer biasesBuffer = cl::Buffer(context, CL_MEM_READ_ONLY, out_features*sizeof(float));
+				// cl::Buffer inFeaturesBuffer = cl::Buffer(context, CL_MEM_READ_ONLY, sizeof(int));
+				// cl::Buffer outFeaturesBuffer = cl::Buffer(context, CL_MEM_READ_ONLY, sizeof(int));
 
-				queue.enqueueWriteBuffer(inputBuffer, CL_TRUE, 0, in_features*sizeof(float), input_buffer);
-				queue.enqueueWriteBuffer(outputBuffer, CL_TRUE, 0, out_features*sizeof(float), output_buffer);
-				queue.enqueueWriteBuffer(weightsBuffer, CL_TRUE, 0, in_features*out_features*sizeof(float), w[weight_count]);
-				queue.enqueueWriteBuffer(biasesBuffer, CL_TRUE, 0, out_features*sizeof(float), w[weight_count+1]);
-				queue.enqueueWriteBuffer(inFeaturesBuffer, CL_TRUE, 0, sizeof(int), &in_features);
-				queue.enqueueWriteBuffer(outFeaturesBuffer, CL_TRUE, 0, sizeof(int), &out_features);
+				// queue.enqueueWriteBuffer(inputBuffer, CL_TRUE, 0, in_features*sizeof(float), input_buffer);
+				// queue.enqueueWriteBuffer(outputBuffer, CL_TRUE, 0, out_features*sizeof(float), output_buffer);
+				// queue.enqueueWriteBuffer(weightsBuffer, CL_TRUE, 0, in_features*out_features*sizeof(float), w[weight_count]);
+				// queue.enqueueWriteBuffer(biasesBuffer, CL_TRUE, 0, out_features*sizeof(float), w[weight_count+1]);
+				// queue.enqueueWriteBuffer(inFeaturesBuffer, CL_TRUE, 0, sizeof(int), &in_features);
+				// queue.enqueueWriteBuffer(outFeaturesBuffer, CL_TRUE, 0, sizeof(int), &out_features);
 
-				std::ifstream sourceFile("cl_kernels/relu_linear.cl");
-				std::string sourceCode(
-				std::istreambuf_iterator<char>(sourceFile),
-				(std::istreambuf_iterator<char>()));
-				cl::Program::Sources source(1,
-				std::make_pair(sourceCode.c_str(),
-				sourceCode.length() + 1));
+				// std::ifstream sourceFile("cl_kernels/relu_linear.cl");
+				// std::string sourceCode(
+				// std::istreambuf_iterator<char>(sourceFile),
+				// (std::istreambuf_iterator<char>()));
+				// cl::Program::Sources source(1,
+				// std::make_pair(sourceCode.c_str(),
+				// sourceCode.length() + 1));
 
-				cl::Program program = cl::Program(context, source);
+				// cl::Program program = cl::Program(context, source);
 
-				program.build(devices);
+				// program.build(devices);
 
-				cl::Kernel kernel(program, "relu_linear");
+				// cl::Kernel kernel(program, "relu_linear");
 
-				kernel.setArg(0, inFeaturesBuffer);
-				kernel.setArg(1, outFeaturesBuffer);
-				kernel.setArg(2, inputBuffer);
-				kernel.setArg(3, weightsBuffer);
-				kernel.setArg(4, biasesBuffer);
-				kernel.setArg(5, outputBuffer);
+				// kernel.setArg(0, inFeaturesBuffer);
+				// kernel.setArg(1, outFeaturesBuffer);
+				// kernel.setArg(2, inputBuffer);
+				// kernel.setArg(3, weightsBuffer);
+				// kernel.setArg(4, biasesBuffer);
+				// kernel.setArg(5, outputBuffer);
 
-				cl::NDRange global(out_features, 1);
-				cl::NDRange local(1, 1);
-				cl::Event event;
-				queue.enqueueNDRangeKernel(kernel, cl::NullRange, global, local,NULL,&event);
-				queue.finish();
+				// cl::NDRange global(out_features, 1);
+				// cl::NDRange local(1, 1);
+				// cl::Event event;
+				// queue.enqueueNDRangeKernel(kernel, cl::NullRange, global, local,NULL,&event);
+				// queue.finish();
 
-				queue.enqueueReadBuffer(outputBuffer, CL_TRUE, 0, out_features*sizeof(float), output_buffer);
-				cl_ulong time_start;
-				cl_ulong time_end;
+				// queue.enqueueReadBuffer(outputBuffer, CL_TRUE, 0, out_features*sizeof(float), output_buffer);
+				// cl_ulong time_start;
+				// cl_ulong time_end;
 					
-				event.wait();
-				double total_time;
-				event.getProfilingInfo(CL_PROFILING_COMMAND_END, &time_end); 
-				event.getProfilingInfo(CL_PROFILING_COMMAND_START, &time_start);
-				total_time = time_end - time_start;
-				/* Results */
-				std::cout << "Execution time in milliseconds for Fully Connected/Dense layer " << total_time*1.0e-6f << std::endl;   
+				// event.wait();
+				// double total_time;
+				// event.getProfilingInfo(CL_PROFILING_COMMAND_END, &time_end); 
+				// event.getProfilingInfo(CL_PROFILING_COMMAND_START, &time_start);
+				// total_time = time_end - time_start;
+				// /* Results */
+				// std::cout << "Execution time in milliseconds for Fully Connected/Dense layer " << total_time*1.0e-6f << std::endl;   
 			}
 			catch(...)
 			{
@@ -438,7 +439,8 @@ int main()
 			}
 		}
 	}
-	std::cout << output_buffer[0];
+
+	// std::cout << output_buffer[0]<< endl;
 
 	
 return 0;

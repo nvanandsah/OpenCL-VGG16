@@ -1,8 +1,10 @@
 # OpenCL include directory
-OCL_INC = /opt/AMDAPPSDK-3.0/include
+# OCL_INC = /opt/AMDAPPSDK-3.0/include
+OCL_INC = /opt/intel/opencl/include
 
 # OpenCL lib directory
-OCL_LIB = /opt/AMDAPPSDK-3.0/lib/x86_64
+# OCL_LIB = /opt/AMDAPPSDK-3.0/lib/x86_64
+OCL_LIB = /opt/intel/opencl
 
 # C compiler to use
 CC = g++
@@ -11,7 +13,8 @@ CC = g++
 CPPFLAGS = -Wall -O3
 
 # header file directories
-INCLUDES = -I/usr/include -I${OCL_INC} -I Utils
+# INCLUDES = -I/usr/include -I${OCL_INC} -I Utils
+INCLUDES = -I/usr/include -I${OCL_INC} 
 
 # library paths
 LFLAGS = -L${OCL_LIB}
@@ -20,7 +23,8 @@ LFLAGS = -L${OCL_LIB}
 LIBS = -lOpenCL
 
 # source files
-SRCS = main.cpp Utils/utils.cpp 
+# SRCS = main.cpp Utils/utils.cpp 
+SRCS = main.cpp 
 
 # object files 
 OBJS = $(SRCS:.c=.o)
