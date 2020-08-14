@@ -10,23 +10,23 @@ using namespace std;
 // #include "utils.h"
 // #include "bmp-utils.h"
 
-float* readImgtxt(char *filename){
-	float *img;
-	int channels = 3;
-	int size = 32;
-	img = new float [size*size*channels];
 
-	FILE *fp = fopen(filename, "r");
-	
-	if (fp == NULL){
+float* readImgtxt(char *filename){
+	int channels = 3;
+	int size = 224;
+	float* img = new float [size*size*channels];
+
+	ifstream fp("mug.txt");
+	if (!fp){
 		std::cout<<"test image open failed!";
 		exit(-1);
 	}
 	for(int channels=0; channels<3; channels++){
 		for(int i=0; i<size; i++){
-			for(int j=0; j<size; j++)
-				fscanf(fp, "%f\n", img + i*size + j + channels*(size*size));
+			for(int j=0; j<size; j++){
+					fp >> img[i*size + j + channels*(size*size)];
 		}
+	}
 	}
 	return img;
 }
@@ -187,10 +187,10 @@ int main()
     }
 	float *hInputImage;
 	float *hOutputImage;
-	int imageRows = 32;
-	int imageCols = 32;
+	int imageRows = 1;
+	int imageCols = 1;
 	
-	char* inputImagePath = "snail.txt";
+	char* inputImagePath = "mug.txt";
 	/*
 			0 -- Conv
 			1 -- MaxPool
@@ -230,7 +230,7 @@ int main()
 				cl::Buffer imgColsBuffer = cl::Buffer(context, CL_MEM_READ_ONLY, sizeof(int));
 
 				queue.enqueueWriteBuffer(inputBuffer, CL_TRUE, 0, in_channels*imgRows*imgCols*sizeof(float), input_buffer);
-				queue.enqueueWriteBuffer(filterBuffer, CL_TRUE, 0, in_channels*out_channels*kernel_size*kernel_size*sizeof(float), layer1.weights);
+				queue.enqueueWriteBuffer(filterBuffer, CL_TRUE, 0, in_channels*out_channels*kernel_size*kernel_size*sizeof(float), layer1.weights2);
 				queue.enqueueWriteBuffer(biasBuffer, CL_TRUE, 0, out_channels*sizeof(float), layer1.biases);
 				queue.enqueueWriteBuffer(outputBuffer, CL_TRUE, 0, out_channels*imgRows*imgCols*sizeof(float), hOutputImage);
 				queue.enqueueWriteBuffer(in_channelsBuffer, CL_TRUE, 0, sizeof(int), &in_channels);
@@ -239,7 +239,7 @@ int main()
 				queue.enqueueWriteBuffer(imgRowsBuffer, CL_TRUE, 0, sizeof(int), &imgRows);
 				queue.enqueueWriteBuffer(imgColsBuffer, CL_TRUE, 0, sizeof(int), &imgCols);
 
-				std::ifstream sourceFile("Kernels/conv.cl");
+				std::ifstream sourceFile("Kernels/Conv.cl");
 				std::string sourceCode(
 				std::istreambuf_iterator<char>(sourceFile),(std::istreambuf_iterator<char>()));
 				cl::Program::Sources source(1, std::make_pair(sourceCode.c_str(),sourceCode.length() + 1));
